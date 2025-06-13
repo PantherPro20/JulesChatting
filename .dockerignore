@@ -1,0 +1,44 @@
+# Git files
+.git
+.gitignore
+
+# Docker files (not needed in build context if managed by docker-compose or build scripts)
+# Dockerfile # Commented out as it might be useful in some CI contexts, but generally not needed in image.
+# docker-compose.yml # Same as above.
+# nginx.conf # This IS copied by Dockerfile, so MUST NOT be ignored.
+
+# Node.js dependencies and build artifacts
+node_modules/
+build/ # Vite's output directory (specified in vite.config.js)
+dist/ # Common default output directory, good to ignore.
+coverage/ # Test coverage reports
+*.log # Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files (sensitive, should not be in image; use build args/env vars)
+.env
+.env.*
+!/.env.example # Include if you have an example .env file for guidance
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw? # Swap files
+
+# Other temporary or local files
+*.local
+*.tmp
+*.bak

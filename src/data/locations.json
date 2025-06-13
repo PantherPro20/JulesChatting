@@ -1,0 +1,24 @@
+{
+  "countries": [
+    {
+      "name": "USA",
+      "states": ["New York", "California", "Texas", "Florida", "Illinois"]
+    },
+    {
+      "name": "Canada",
+      "states": ["Ontario", "Quebec", "British Columbia", "Alberta", "Manitoba"]
+    },
+    {
+      "name": "United Kingdom",
+      "states": ["England", "Scotland", "Wales", "Northern Ireland"]
+    },
+    {
+      "name": "Australia",
+      "states": ["New South Wales", "Victoria", "Queensland", "Western Australia", "South Australia"]
+    },
+    {
+      "name": "Germany",
+      "states": ["Bavaria", "Berlin", "Hamburg", "Hesse", "Saxony"]
+    }
+  ]
+}

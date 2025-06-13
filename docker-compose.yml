@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # These arguments are passed to the Dockerfile during the build
+        # They should be replaced with actual values or sourced from a .env file
+        # For demonstration, some placeholders are used.
+        # In a real scenario, use a .env file and reference variables here.
+        REACT_APP_ID: "your-docker-app-id" # Example
+        REACT_APP_FIREBASE_API_KEY: "YOUR_DOCKER_API_KEY"
+        REACT_APP_FIREBASE_AUTH_DOMAIN: "YOUR_DOCKER_AUTH_DOMAIN"
+        REACT_APP_FIREBASE_PROJECT_ID: "YOUR_DOCKER_PROJECT_ID"
+        REACT_APP_FIREBASE_STORAGE_BUCKET: "YOUR_DOCKER_STORAGE_BUCKET"
+        REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "YOUR_DOCKER_MESSAGING_SENDER_ID"
+        REACT_APP_FIREBASE_APP_ID: "YOUR_DOCKER_APP_ID" # Firebase App ID
+        REACT_APP_FIREBASE_MEASUREMENT_ID: "YOUR_DOCKER_MEASUREMENT_ID" # Optional
+        REACT_APP_INITIAL_AUTH_TOKEN: null # Example, can be an actual token string
+    ports:
+      - "80:80" # Map host port 80 to container port 80 (Nginx default)
+    container_name: secure-interactive-app-web
+    # To use a .env file for build arguments:
+    # env_file:
+    #   - .env # Make sure .env file exists in the context directory
+    # And then in args, you would reference them like:
+    # REACT_APP_ID: ${REACT_APP_ID_FROM_ENV}
+    # (Note: docker-compose substitutes .env variables directly if args are structured like REACT_APP_VARNAME: ${VARNAME_IN_DOT_ENV})
+    # Or, if the .env file only contains VAR=value lines that match ARG names in Dockerfile,
+    # then they are automatically available to `docker build` when `docker-compose build` is run.
+    # For this example, explicit args are shown.
+
+networks:
+  default:
+    driver: bridge
+
+# To manage environment variables securely and conveniently for Docker builds,
+# create a .env file in the project root (and add it to .gitignore):
+#
+# .env example:
+# REACT_APP_ID="your-actual-app-id"
+# REACT_APP_FIREBASE_API_KEY="your-api-key"
+# REACT_APP_FIREBASE_AUTH_DOMAIN="your-auth-domain"
+# REACT_APP_FIREBASE_PROJECT_ID="your-project-id"
+# # ... and so on for other variables
+#
+# Then, in docker-compose.yml, if your .env file has variables like:
+# APP_ID_FROM_ENV=your-actual-app-id
+# You could use:
+# build:
+#   context: .
+#   args:
+#     REACT_APP_ID: ${APP_ID_FROM_ENV} # This now reads from the .env file if VARNAME_IN_DOT_ENV matches
+#
+# If the .env file variable names match the ARG names in the Dockerfile (e.g. REACT_APP_ID=value in .env),
+# Docker Compose automatically makes them available to `docker build` as ARGs.
+# So, you might not need to list them under `args:` here if your .env file is set up that way.
+# For clarity in this subtask, they are explicitly listed.
