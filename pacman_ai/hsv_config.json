@@ -1,0 +1,27 @@
+{
+    "pacman_yellow": {"lower": [20, 100, 100], "upper": [30, 255, 255]},
+    "ghost_red": {
+        "name_for_detection": "red",
+        "lower1": [0, 120, 70], "upper1": [10, 255, 255],
+        "lower2": [170, 120, 70], "upper2": [180, 255, 255]
+    },
+    "ghost_pink": {
+        "name_for_detection": "pink",
+        "lower1": [140, 100, 100], "upper1": [170, 255, 255]
+    },
+    "ghost_cyan": {
+        "name_for_detection": "cyan",
+        "lower1": [80, 100, 100], "upper1": [100, 255, 255]
+    },
+    "ghost_orange": {
+        "name_for_detection": "orange",
+        "lower1": [10, 100, 100], "upper1": [20, 255, 255]
+    },
+    "ghost_frightened_blue": {
+        "name_for_detection": "frightened_blue",
+        "lower1": [100, 150, 50], "upper1": [130, 255, 255]
+    },
+    "pellet_white": {
+        "lower": [0, 0, 180], "upper": [180, 40, 255]
+    }
+}

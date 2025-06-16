@@ -1,146 +1,154 @@
-# Secure & Interactive Web Application
+# AI Pac-Man using Reinforcement Learning
 
-This project is a single-page application (SPA) built with React.js for the frontend and Firebase (Authentication) for backend user management. It features a secure authentication flow with a client-side simulated Two-Factor Authentication (2FA) and an interactive main dashboard. The application is styled with Tailwind CSS and containerized using Docker.
+## Project Overview
+This project aims to develop an Artificial Intelligence agent that can learn to play Pac-Man. It includes:
+1.  A game simulation environment built in Python.
+2.  A rule-based AI (`ai_logic.py`) for basic gameplay (now considered legacy).
+3.  A Reinforcement Learning (RL) agent using a Deep Q-Network (DQN) trained on the simulated environment (`train_rl.py`).
+4.  Experimental support for a "hybrid visual" agent (`run_live_agent.py`) that uses screen capture and visual perception to play the Google Doodle Pac-Man game, controlled by a (potentially RL-trained) model.
 
-## Core Technologies
+## How it Works
 
-*   **Frontend:** React.js (Vite build tool)
-*   **Backend Services:** Firebase Authentication (for user sign-up/login)
-*   **Styling:** Tailwind CSS
-*   **Containerization:** Docker, Docker Compose
-*   **Language:** JavaScript (ES6+)
+### 1. Simulated Environment & RL Training
+The primary AI agent learns through trial and error in a simulated game environment.
+- **Reinforcement Learning (DQN):** The agent uses a Deep Q-Network to learn the optimal action to take in any given game state. It learns by receiving rewards or penalties for its actions (e.g., +10 for eating a pellet, -500 for being caught by a ghost).
+- **Key Components for Simulated RL:**
+  - **`pacman_ai/game_state.py`**: Defines the `GameState` class, representing all aspects of the game (maze, Pac-Man, ghosts, pellets) for the simulation.
+  - **`pacman_ai/rl_agent.py`**: Contains the `RLAgent` class, which implements the DQN algorithm. This includes the neural network model (built with TensorFlow/Keras), experience replay memory, and the logic for action selection (epsilon-greedy) and learning.
+  - **`pacman_ai/train_rl.py`**: The main script for training the RL agent against the simulated environment. It manages the training loop, interaction between the agent and the game simulation, state vectorization (from `GameState`), and reward processing. The `step()` function within this script advances the game simulation one timestep.
+  - **`pacman_ai/simulation.py`**: Provides the core Pac-Man game mechanics for the simulation, entity definitions (PacMan, Ghost, Pellet), and reward constants used by `train_rl.py`.
 
-## Key Features
+### 2. Hybrid Visual Agent (Experimental)
+This approach allows an agent to play the web-based Google Doodle Pac-Man by "seeing" the screen and sending keyboard commands.
+- **Visual Perception:** Uses OpenCV to process screen captures, identify game elements (Pac-Man, ghosts, pellets) by color, and determine their positions. HSV color thresholds are defined in `hsv_config.json` and require user calibration.
+- **Hybrid Control:** Uses `mss` for screen capture and `pyautogui` for sending keyboard commands.
+- **Key Components for Hybrid Visual Agent:**
+  - **`pacman_ai/visual_perception.py`**: Contains functions to load images, convert to HSV, apply color masks, and find game objects (Pac-Man, ghosts by color including frightened state, normal/power pellets by color and size). Loads HSV thresholds from `hsv_config.json`.
+  - **`pacman_ai/hybrid_control.py`**: Provides functions to capture specified screen regions and send keyboard actions ('up', 'down', 'left', 'right').
+  - **`pacman_ai/live_agent_utils.py`**: Contains functions (`get_visual_state_vector`, `calculate_visual_state_size`) to convert the raw visual detection data into a fixed-size numerical state vector suitable for an RL agent. This includes normalizing coordinates and padding lists of detected objects.
+  - **`pacman_ai/run_live_agent.py`**: Orchestrates the live visual agent. It captures the screen, uses visual perception to identify game elements, creates a state vector, gets an action from an `RLAgent` (which would ideally be trained on this visual state), and sends the action to the game window.
+  - **`pacman_ai/hsv_config.json`**: Stores HSV color thresholds for visual detection, requiring user calibration.
 
-*   **Secure User Authentication:**
-    *   Email and Password registration.
-    *   User login.
-    *   "Forgot Password?" link placeholder.
-*   **Client-Side Two-Factor Authentication (2FA):**
-    *   Simulated 2FA process after registration and login.
-    *   A 6-digit code is "sent" (displayed to the user) for verification.
-    *   Disclaimer that this is a simulation for demonstration purposes.
-*   **Main Application Dashboard:**
-    *   Displays authenticated user's email and UID.
-    *   Live, real-time clock updating every second.
-    *   Dependent dropdowns for Country and State selection (using local JSON data).
-*   **Responsive Design:** Fully responsive UI optimized for desktop, tablet, and mobile devices.
-*   **Modern UI/UX:** Clean, intuitive interface with rounded corners on all elements.
-*   **Error Handling:** User-friendly error messages displayed within the UI.
-*   **Loading States:** Visual feedback during asynchronous operations.
-
-## Project Structure
-
+## Directory Structure
 ```
-/public/
-  index.html          # Main HTML entry point
-/src/
-  /components/        # React components
-    /Auth/            # Authentication related components
-    /Dashboard/       # Dashboard related components
-  /data/
-    locations.json    # Static data for country/state dropdowns
-  App.jsx             # Main application component and routing logic
-  firebaseConfig.js   # Fallback Firebase configuration
-  index.css           # Global styles and Tailwind CSS imports
-  main.jsx            # React application entry point
-.dockerignore         # Specifies files to ignore in Docker build context
-.gitignore            # Specifies intentionally untracked files that Git should ignore
-Dockerfile            # Instructions to build the Docker image
-LICENSE               # Project License (Assumed MIT, but not explicitly created in this task)
-README.md             # This file
-docker-compose.yml    # Defines and runs multi-container Docker applications
-nginx.conf            # Nginx configuration for serving the SPA
-package.json          # Project metadata and dependencies
-postcss.config.js     # PostCSS configuration
-tailwind.config.js    # Tailwind CSS configuration
-vite.config.js        # Vite build tool configuration
+.
+├── pacman_ai/
+│   ├── __init__.py
+│   ├── game_state.py         # Core game state for simulation
+│   ├── ghost.py              # Ghost class for simulation
+│   ├── maze.py               # Maze class for simulation
+│   ├── pacman.py             # PacMan class for simulation
+│   ├── pellet.py             # Pellet classes for simulation
+│   ├── pathfinding.py        # A* pathfinding (used by simulated ghosts/rule-based AI)
+│   ├── ai_logic.py           # Rule-based AI (legacy)
+│   ├── simulation.py         # Simulation engine, reward constants for RL training
+│   ├── rl_agent.py           # DQN Reinforcement Learning Agent (for simulation & visual)
+│   ├── train_rl.py           # Script to train the RL Agent using the simulation
+│   ├── visual_perception.py  # Image processing for detecting game elements
+│   ├── hybrid_control.py     # Screen capture and keyboard control
+│   ├── live_agent_utils.py   # Utilities for visual state vector creation
+│   ├── run_live_agent.py     # Main script for running the live visual agent
+│   ├── hsv_config.json       # HSV color thresholds for visual perception
+│   └── tests/                # Unit tests
+├── requirements.txt          # Python dependencies
+└── README.md                 # This file
 ```
 
-## Prerequisites
+## Setup and Installation (Windows 11 Example)
 
-*   **Node.js and npm:** [Download Node.js](https://nodejs.org/) (npm is included).
-*   **Docker Desktop:** [Download Docker Desktop](https://www.docker.com/products/docker-desktop) (for Docker-based setup).
-*   **Firebase Project:**
-    1.  Create a project at [Firebase Console](https://console.firebase.google.com/).
-    2.  Enable **Authentication** > **Sign-in method** > **Email/Password**.
-    3.  From Project settings, get your Firebase SDK configuration (apiKey, authDomain, etc.).
+1.  **Install Python:**
+    *   Ensure you have Python installed (version 3.8-3.10 recommended).
+    *   Download from [python.org](https://www.python.org/downloads/).
+    *   During installation, check "Add Python to PATH".
 
-## Setup and Running Locally (Without Docker)
+2.  **Get the Code:**
+    *   **Git (Recommended):**
+        *   Install Git from [git-scm.com](https://git-scm.com/download/win).
+        *   Clone the repository: `git clone <your_repository_url_here>`
+        *   `cd <repository_directory_name>`
+    *   **Manual Download:** Download and extract ZIP.
 
-1.  **Clone/Download the project.**
-2.  **Configure Firebase:**
-    *   **Option 1 (Recommended for Vite): Create `.env.local` file:**
-        In the project root, create a file named `.env.local` and add your Firebase configuration:
-        ```env
-        VITE_APP_ID=my-local-app
-        VITE_FIREBASE_API_KEY=YOUR_API_KEY
-        VITE_FIREBASE_AUTH_DOMAIN=YOUR_AUTH_DOMAIN
-        VITE_FIREBASE_PROJECT_ID=YOUR_PROJECT_ID
-        VITE_FIREBASE_STORAGE_BUCKET=YOUR_STORAGE_BUCKET
-        VITE_FIREBASE_MESSAGING_SENDER_ID=YOUR_MESSAGING_SENDER_ID
-        VITE_FIREBASE_APP_ID=YOUR_FIREBASE_APP_ID_FROM_SDK
-        # VITE_FIREBASE_MEASUREMENT_ID=YOUR_MEASUREMENT_ID (Optional)
-        ```
-    *   **Option 2 (Directly in `index.html` - less ideal for Vite):**
-        Open `public/index.html` and update the `window.__firebase_config` object and `window.__app_id` with your Firebase project details.
-3.  **Install Dependencies:**
-    ```bash
-    npm install
-    ```
-4.  **Run Development Server:**
-    ```bash
-    npm run dev
-    ```
-    The application will typically be available at `http://localhost:3000`.
+3.  **Create a Virtual Environment (Recommended):**
+    *   In the project root: `python -m venv venv`
+    *   Activate: `.\venv\Scripts\activate` (You should see `(venv)` in your prompt).
 
-## Building and Running with Docker
+4.  **Install Dependencies:**
+    *   With venv activated: `pip install -r requirements.txt`
+    *   **Note for Hybrid Visual Agent:** `pyautogui` might have additional system dependencies on Linux for interacting with the display server (e.g., `sudo apt-get install scrot python3-tk python3-dev` and potentially Xvfb for headless virtual display). `mss` also relies on X server capabilities.
 
-1.  **Clone/Download the project.**
-2.  **Configure Firebase for Docker Build:**
-    *   **Modify `docker-compose.yml` directly:**
-        Edit the `args` section in `docker-compose.yml`. Replace placeholder values (like `YOUR_DOCKER_API_KEY`) with your actual Firebase configuration values. For example:
-        ```yaml
-        services:
-          web:
-            build:
-              context: .
-              dockerfile: Dockerfile
-              args:
-                REACT_APP_ID: "your-actual-app-id" # Can be any string
-                REACT_APP_FIREBASE_API_KEY: "YOUR_ACTUAL_API_KEY"
-                REACT_APP_FIREBASE_AUTH_DOMAIN: "YOUR_ACTUAL_AUTH_DOMAIN"
-                REACT_APP_FIREBASE_PROJECT_ID: "YOUR_ACTUAL_PROJECT_ID"
-                REACT_APP_FIREBASE_STORAGE_BUCKET: "YOUR_ACTUAL_STORAGE_BUCKET"
-                REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "YOUR_ACTUAL_MESSAGING_SENDER_ID"
-                REACT_APP_FIREBASE_APP_ID: "YOUR_ACTUAL_FIREBASE_APP_ID_FROM_SDK"
-                # REACT_APP_FIREBASE_MEASUREMENT_ID: "YOUR_ACTUAL_MEASUREMENT_ID" (Optional)
-                # REACT_APP_INITIAL_AUTH_TOKEN: null # Or your token
-        ```
-    *   **(Alternative) Using Environment Variables in your Shell:**
-        Instead of editing `docker-compose.yml` directly, you can set these `REACT_APP_...` variables in your shell environment before running `docker-compose up`. Docker Compose will automatically substitute them if the `args` in `docker-compose.yml` are in the format `VARIABLE_NAME: ${SHELL_VARIABLE_NAME}` or if the shell variable name exactly matches the ARG name. For the current `docker-compose.yml` structure, directly editing or ensuring your shell environment variables match the `REACT_APP_...` names is necessary.
-3.  **Build and Run Docker Container:**
-    ```bash
-    docker-compose up --build
-    ```
-    The application will be available at `http://localhost` (or the port you mapped if different from 80).
-4.  **Stop Docker Container:**
-    Press `Ctrl+C` in the terminal where `docker-compose` is running. To remove the containers defined in `docker-compose.yml`, run:
-    ```bash
-    docker-compose down
-    ```
+## How to Run
 
-## Firebase Configuration Notes
+### 1. Training the RL Agent (Simulated Environment)
+   *   Ensure virtual environment is activated.
+   *   Navigate to project root.
+   *   Run: `python -m pacman_ai.train_rl`
+   *   **Training Process:** Console output shows episode progress, rewards, epsilon, and steps. Model weights (e.g., `pacman_rl_agent_final_ep<N>.weights.h5`) are saved in the project root.
+   *   Modify `EPISODES`, etc., in `pacman_ai/train_rl.py` to control training.
 
-*   The application is designed to use Firebase's free "Spark Plan." Be mindful of the plan's limitations on reads/writes and storage if extending Firestore usage.
-*   Ensure your Firebase project's Authentication (Email/Password) is enabled.
-*   The Firebase configuration is primarily injected at build time through Vite's `define` feature, which sources values from environment variables (prefixed with `VITE_` for local dev, or passed as `ARG`s then `ENV` for Docker builds).
-*   Fallback configurations are present in `src/firebaseConfig.js` and `vite.config.js` but should ideally be overridden by your actual project configuration for the application to function correctly with your Firebase backend.
+### 2. Running the Live Visual Agent (`run_live_agent.py`)
 
-## Code Quality
+This mode allows the agent to play the Google Doodle Pac-Man game by watching the screen and sending keyboard commands.
 
-*   **Structure:** Well-structured and modular.
-*   **Comments:** Extensively commented.
-*   **Error Handling:** User-facing error messages within the UI.
-*   **Best Practices:** Follows modern JavaScript/React practices.
-```
+*   **Crucial Prerequisites:**
+    *   **Graphical Environment:** Must be run in a graphical desktop environment (not a headless server without Xvfb or similar).
+    *   **Dependencies:** Python and all packages from `requirements.txt` installed.
+    *   **Game Ready:** The Google Doodle Pac-Man game (`https://www.google.com/logos/2010/pacman10-i.html`) must be open in a browser window.
+    *   **Window Focus:** The Pac-Man game window **must be the active, focused window** on your desktop when `run_live_agent.py` is active. This is critical for `pyautogui` to send keyboard commands to the correct application.
+
+*   **Calibration Steps (User Responsibility - CRITICAL for visual agent):**
+
+    1.  **Screen Capture Area (`IMAGE_CAPTURE_PARAMS` in `run_live_agent.py`):**
+        *   You **must** adjust the `IMAGE_CAPTURE_PARAMS` dictionary in `pacman_ai/run_live_agent.py`.
+        *   `top_offset`, `left_offset`: Pixels from the top-left corner of your primary screen to the top-left corner of the Pac-Man game area (canvas).
+        *   `width`, `height`: The pixel dimensions of the Pac-Man game area itself.
+        *   `monitor_number`: Typically 1 for the primary monitor. Use tools like `mss.mss().monitors` in a Python console to list monitors if needed.
+        *   **How to find coordinates:** Use your OS's screenshot tool (e.g., Snipping Tool on Windows with a ruler mode, or GIMP/Photoshop rulers) or a dedicated screen coordinate utility to measure these pixel values accurately.
+
+    2.  **HSV Color Threshold Tuning (`pacman_ai/hsv_config.json`):**
+        *   The accuracy of the visual perception heavily depends on the HSV color thresholds defined in `pacman_ai/hsv_config.json`. The provided values are **estimates and will likely need significant tuning** for your specific screen, browser, and lighting conditions.
+        *   **Methodology for Tuning:**
+            1.  Open the Pac-Man game.
+            2.  Take a screenshot of the game.
+            3.  Open the screenshot in an image editor that has a color picker tool capable of displaying HSV values (e.g., GIMP, Photoshop, online color pickers).
+            4.  For each game element (Pac-Man yellow, each distinct ghost color, frightened blue ghosts, pellets), use the color picker to sample HSV values from multiple points on that element. Note the range of H, S, and V values.
+            5.  Update the `lower` and `upper` lists in `hsv_config.json` for each element. Remember OpenCV's Hue range is typically 0-179. Red might require two ranges if its hue values wrap around 0/180.
+            6.  You can test your HSV thresholds locally by adapting the `if __name__ == "__main__":` block in `pacman_ai/visual_perception.py`. Load your sample screenshot, call the detection functions with your new HSV values, and use `cv2.imshow()` to display the original image with detected contours/masks overlaid. This iterative process is key to good detection.
+
+*   **RL Agent State for Visual Mode:**
+    *   The `RLAgent` in `run_live_agent.py` is initialized with a `state_size` derived from `calculate_visual_state_size` in `live_agent_utils.py`. This state vector is based purely on the detected visual elements.
+    *   By default, the script initializes a new, untrained agent for this visual state.
+    *   The line `agent.load("path_to_visual_model.weights.h5")` in `run_live_agent.py` is commented out. To use a trained model, you would uncomment this and provide the path to weights file that was trained specifically on this visual state representation.
+
+*   **Running the Script:**
+    1.  Ensure prerequisites and calibration are done.
+    2.  Activate your virtual environment.
+    3.  Navigate to the project root.
+    4.  Run: `python -m pacman_ai.run_live_agent`
+    5.  Quickly switch focus to the Pac-Man game window before the 5-second countdown in the script ends.
+
+### 3. Training the Live Visual Agent (Advanced - Conceptual)
+
+The current `run_live_agent.py` is set up for "inference" (acting with `epsilon=0.0`) and does not implement a live training loop using visual input. Training an agent directly on live visual input is a more complex task.
+
+*   **Challenges for Live Training:**
+    *   **Reward Engineering:** Deriving a reward signal directly from screen images is non-trivial. It would require robust visual logic or OCR to detect score changes, Pac-Man dying, pellets being eaten, level completion, etc. This is a significant development step.
+    *   **Game State Consistency:** Unlike a simulation, the live game state is only observable through potentially noisy visual perception.
+    *   **Speed and Stability:** The perception-action loop must be fast enough to play the game effectively. Live game interaction can be less stable than a simulation.
+
+*   **Conceptual Steps for Implementing Live Training (Future Development):**
+    1.  Modify the main loop in `run_live_agent.py`.
+    2.  After `send_action_to_game()`, add a short delay to allow the game to react.
+    3.  Capture the `next_screen_image`.
+    4.  Implement robust visual logic to determine the `reward` for the action taken (e.g., did score increase? Did Pac-Man get caught? Was a pellet eaten?) and the `done` status (game over or level cleared).
+    5.  Generate the `next_state_vector` from this new visual information.
+    6.  Call `agent.remember(current_state_vector, action_index, reward, next_state_vector, done)`.
+    7.  Call `agent.replay(BATCH_SIZE)` periodically to train the model.
+    8.  Set `agent.epsilon` to a value greater than `epsilon_min` to allow for exploration during training.
+
+## Development Notes
+- **Simulated Training:** State representation is in `train_rl.py` (`get_state_vector`), rewards from `simulation.py`.
+- **Visual Agent:** State representation from visual input is in `live_agent_utils.py` (`get_visual_state_vector`). HSV Color tuning is critical (`hsv_config.json`). Screen capture coordinates in `run_live_agent.py` also need calibration.
+- The DQN agent's neural network architecture and hyperparameters are in `pacman_ai/rl_agent.py`.
+
+---
+*(Replace `<your_repository_url_here>` and `<repository_directory_name>` with actual values if applicable when this is pushed to a remote repository.)*
