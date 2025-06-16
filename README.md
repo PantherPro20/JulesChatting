@@ -57,9 +57,10 @@ This approach allows an agent to play the web-based Google Doodle Pac-Man by "se
 ## Setup and Installation (Windows 11 Example)
 
 1.  **Install Python:**
-    *   Ensure you have Python installed (version 3.8-3.10 recommended).
-    *   Download from [python.org](https://www.python.org/downloads/).
-    *   During installation, check "Add Python to PATH".
+    *   **Recommended Python Versions:** For compatibility with TensorFlow (a core dependency), it is highly recommended to use **Python 3.9, 3.10, 3.11, or 3.12**. As of late 2024/early 2025, TensorFlow does not yet have stable releases for Python 3.13 or newer. Using Python 3.13+ will likely lead to installation errors for TensorFlow.
+    *   You can download specific Python versions from [python.org](https://www.python.org/downloads/windows/).
+    *   During installation, make sure to check the box "Add Python to PATH".
+    *   If you currently have a newer, incompatible version of Python (like 3.13+), you will need to uninstall it and install one of the recommended versions, or use a Python version manager (e.g., `pyenv-win`) to manage multiple Python installations.
 
 2.  **Get the Code:**
     *   **Git (Recommended):**
