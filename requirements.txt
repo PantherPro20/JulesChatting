@@ -3,3 +3,4 @@ numpy
 pyautogui
 opencv-python
 mss
+playwright
